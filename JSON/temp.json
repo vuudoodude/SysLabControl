@@ -1,0 +1,177 @@
+{
+  "name": "A20 / A21",
+  "channels": [
+    {
+      "name": "A20",
+      "address": "A08B00C20",
+      "type": "8bit Relay Controller",
+      "group": "A20 / A21"
+    },
+    {
+      "name": "A21",
+      "address": "A08B00C21",
+      "type": "8bit Relay Controller",
+      "group": "A20 / A21"
+    }
+  ],
+  "timeline": {
+    "events": [
+      {
+        "title": "Relays OFF",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 0,
+          "millis": 0
+        },
+        "command": "Dff",
+        "description": "Turns Relays Off",
+        "TIME_ZERO": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 0,
+          "millis": 0
+        }
+      },
+      {
+        "title": "Relays ON",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 15,
+          "millis": 15000
+        },
+        "command": "D00",
+        "description": "Turns All Relays ON",
+        "TIME_ZERO": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 0,
+          "millis": 0
+        }
+      },
+      {
+        "title": "Odd Relays ON",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 30,
+          "millis": 30000
+        },
+        "command": "D55",
+        "description": "Turns Odd Relays ON",
+        "TIME_ZERO": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 0,
+          "millis": 0
+        }
+      },
+      {
+        "title": "Even Relays ON",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 45,
+          "millis": 45000
+        },
+        "command": "Daa",
+        "description": "Turns Even Relays ON",
+        "TIME_ZERO": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 0,
+          "millis": 0
+        }
+      }
+    ]
+  }
+}{
+  "name": "A22 / A23",
+  "channels": [
+    {
+      "name": "A22",
+      "address": "A08B00C22",
+      "type": "8bit Relay Controller",
+      "group": "A22 / A23"
+    },
+    {
+      "name": "A23",
+      "address": "A08B00C23",
+      "type": "8bit Relay Controller",
+      "group": "A22 / A23"
+    }
+  ],
+  "timeline": {
+    "events": [
+      {
+        "title": "Relays OFF",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 5,
+          "millis": 5000
+        },
+        "command": "Dff",
+        "description": "Turns Relays Off",
+        "TIME_ZERO": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 0,
+          "millis": 0
+        }
+      },
+      {
+        "title": "Relays ON",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 10,
+          "millis": 10000
+        },
+        "command": "D00",
+        "description": "Turns All Relays ON",
+        "TIME_ZERO": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 0,
+          "millis": 0
+        }
+      },
+      {
+        "title": "Odd Relays ON",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 50,
+          "millis": 50000
+        },
+        "command": "D55",
+        "description": "Turns Odd Relays ON",
+        "TIME_ZERO": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 0,
+          "millis": 0
+        }
+      },
+      {
+        "title": "Even Relays ON",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 65,
+          "millis": 65000
+        },
+        "command": "Daa",
+        "description": "Turns Even Relays ON",
+        "TIME_ZERO": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 0,
+          "millis": 0
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "name": "Control Group 1",
+  "channels": [
+    {
+      "name": "A20",
+      "address": "A08B00C20",
+      "type": "",
+      "group": "Control Group 1"
+    },
+    {
+      "name": "A21",
+      "address": "A08B00C21",
+      "type": "",
+      "group": "Control Group 1"
+    }
+  ],
+  "timeline": {
+    "events": []
+  }
+}{
+  "name": "Control Group 2",
+  "channels": [
+    {
+      "name": "A22",
+      "address": "A08B00C22",
+      "type": "",
+      "group": "Control Group 2"
+    },
+    {
+      "name": "A23",
+      "address": "A08B00C23",
+      "type": "",
+      "group": "Control Group 2"
+    }
+  ],
+  "timeline": {
+    "events": []
+  }
+}
