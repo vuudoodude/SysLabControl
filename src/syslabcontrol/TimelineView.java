@@ -26,15 +26,14 @@ import java.util.Iterator;
  *
  * @author USB_Room
  */
-public class TimelineView extends javax.swing.JPanel  {
+public class TimelineView extends javax.swing.JPanel implements SequenceViewerInterface{
 
     
     
     int viewStart, viewEnd;
-    
     ChannelGroup group;
-    
     Event highlightedEvent;
+    Constant.PlayState playState;
     
     
     
@@ -50,15 +49,12 @@ public class TimelineView extends javax.swing.JPanel  {
         
         this.viewStart = 0;
         this.viewEnd = 500;
-        playingPosition = 0;
-    }
-    protected  void updatePlayingPosition(boolean playerPlaying, boolean playerPaused, int playingPositionInMillis)
-    {
-        this.playerPaused = playerPaused;
-        this.playerPlaying = playerPlaying;
-        this.playingPosition = playingPositionInMillis;
+        currentPosition = 0;
+        sequenceLength = 500;
         
+        playState = Constant.PlayState.STOP;
     }
+
   
     //Constants for tweaking drawing behaviour
     
@@ -70,8 +66,7 @@ public class TimelineView extends javax.swing.JPanel  {
     //variables related to player behaviour
     private final Color playingColor = new Color(0xAAAEE3F5, true); //should be a bluish Alpha highlight
     private final Color pausedColor = new Color(0xAA688D99, true); //should be a darker bluish Alpha highlight
-    private int playingPosition;
-    private boolean playerPaused, playerPlaying;
+    private int currentPosition, sequenceLength; 
     
     
     
@@ -88,7 +83,7 @@ public class TimelineView extends javax.swing.JPanel  {
         {
             paintEvent((Event)i.next(), g2d);
         }
-        if(playerPlaying || playerPaused)
+        if(playState != Constant.PlayState.STOP)
         {
             paintPlayerPosition(g2d);
         }
@@ -169,11 +164,11 @@ public class TimelineView extends javax.swing.JPanel  {
     }
     
     private void paintPlayerPosition(Graphics2D g2d) {
-        System.out.println("Painting player position " + this.playingPosition );
-        if(playingPosition < this.viewStart)
+        System.out.println("Painting player position " + this.currentPosition );
+        if(currentPosition < this.viewStart)
             return;
         
-        double tOffset = playingPosition - viewStart;
+        double tOffset = currentPosition - viewStart;
         double fullView = viewEnd - viewStart;
         double ratio = tOffset / fullView;
         int fullX = getWidth() - getX();
@@ -183,9 +178,9 @@ public class TimelineView extends javax.swing.JPanel  {
         g2d.setStroke(new BasicStroke(1));
         g2d.drawLine(x, 0, x, this.getHeight());
         
-        if (playerPlaying)
+        if (playState == Constant.PlayState.PLAY)
             g2d.setPaint(playingColor);
-        if (playerPaused)
+        if (playState == Constant.PlayState.PAUSE)
             g2d.setPaint(pausedColor);
         g2d.fillRect(0, 0, x, getHeight());
     }
@@ -229,6 +224,23 @@ public class TimelineView extends javax.swing.JPanel  {
     public Color getTimelineColor() {
         return group.viewColor;
     }
+
+    @Override
+    public void updateViewer(int currentPosition, int sequenceLength, Constant.PlayState p) {
+        this.currentPosition = currentPosition;
+        this.sequenceLength = sequenceLength;
+        playState = p;
+        repaint();
+    }
+
+    @Override
+    public Constant.PlayState requestedPlayState() {
+        //this component is a viewer, not a controller.
+        return Constant.PlayState.NO_CHANGE_REQUESTED;
+        
+    }
+
+  
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

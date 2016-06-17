@@ -46,9 +46,9 @@ public class DefinitionsPanel extends javax.swing.JPanel{
     
     ArrayList <ChannelPanel> chanPanList;
     Terminal terminal;
-    final SysLabControl parentFrame;
+    final SequenceEditor parentFrame;
     
-    public DefinitionsPanel(SysLabControl parentFrame) {
+    public DefinitionsPanel(SequenceEditor parentFrame) {
         
         this.terminal = parentFrame.getTerminal();
         this.parentFrame = parentFrame;
@@ -67,14 +67,11 @@ public class DefinitionsPanel extends javax.swing.JPanel{
         jTabbedPane1.removeAll();
         this.chanPanList = new <ChannelPanel> ArrayList();
         
-        Iterator i = parentFrame.groups.iterator();
-        
-        while(i.hasNext())
+        for (ChannelGroup g : parentFrame.sequence.groups) 
         {
-            ChannelGroup g = (ChannelGroup) i.next();
             ChannelPanel ch = new ChannelPanel(g,terminal);
             jTabbedPane1.add(g.groupName, ch);
-            chanPanList.add(ch); 
+            chanPanList.add(ch);
         }           
     }
     public void syncAllTables()
@@ -196,11 +193,12 @@ public class DefinitionsPanel extends javax.swing.JPanel{
     }// </editor-fold>//GEN-END:initComponents
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        parentFrame.saveState();
+        parentFrame.sequence.saveState(this);
     }//GEN-LAST:event_saveButtonActionPerformed
 
     private void loadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadButtonActionPerformed
-        parentFrame.loadState();
+        parentFrame.sequence.loadState(this);
+        parentFrame.updatePanelStates();
     }//GEN-LAST:event_loadButtonActionPerformed
 
     private void addChannelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addChannelButtonActionPerformed
@@ -220,7 +218,7 @@ public class DefinitionsPanel extends javax.swing.JPanel{
         String s = (String) JOptionPane.showInputDialog(parent, "New Group: Name?");
         if(s == null)
             return;
-        parentFrame.groups.add(new ChannelGroup(s.trim()));
+        parentFrame.sequence.groups.add(new ChannelGroup(s.trim()));
         parentFrame.updatePanelStates();
     }//GEN-LAST:event_addGroupButtonActionPerformed
 
@@ -232,7 +230,7 @@ public class DefinitionsPanel extends javax.swing.JPanel{
         int x = JOptionPane.showConfirmDialog(parent, "Are you sure you want to remove group?", "Confirm Removal...", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if ( x == JOptionPane.YES_OPTION)
         {
-            parentFrame.groups.remove(jTabbedPane1.getSelectedIndex());
+            parentFrame.sequence.groups.remove(jTabbedPane1.getSelectedIndex());
             ((ChannelPanel)jTabbedPane1.getComponentAt(jTabbedPane1.getSelectedIndex())).removeGroup();
             jTabbedPane1.remove(jTabbedPane1.getSelectedIndex());
             

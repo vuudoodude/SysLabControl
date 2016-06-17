@@ -1,0 +1,261 @@
+{
+  "groupName": "Alpha",
+  "channels": [
+    {
+      "channelName": "Channel 20",
+      "address": "A08B00C20",
+      "type": "",
+      "group": "Alpha"
+    },
+    {
+      "channelName": "Channel 21",
+      "address": "A08B00C21",
+      "type": "",
+      "group": "Alpha"
+    }
+  ],
+  "timeline": {
+    "events": [
+      {
+        "title": "Turn Off all Relays",
+        "description": "Enter Description",
+        "command": "Dff",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 0,
+          "millis": 0
+        }
+      },
+      {
+        "title": "Turn On Relay D0",
+        "description": "Enter Description",
+        "command": "Dfe",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 2,
+          "millis": 2000
+        }
+      },
+      {
+        "title": "Turn on Relay D1",
+        "description": "Enter Description",
+        "command": "Dfd",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 4,
+          "millis": 4000
+        }
+      },
+      {
+        "title": "Turn on Relay D2",
+        "description": "Enter Description",
+        "command": "Dfb",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 6,
+          "millis": 6000
+        }
+      },
+      {
+        "title": "Turn On Relay D3",
+        "description": "Enter Description",
+        "command": "Df7",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 8,
+          "millis": 8000
+        }
+      },
+      {
+        "title": "Turn On Relay D4",
+        "description": "Enter Description",
+        "command": "Def",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 10,
+          "millis": 10000
+        }
+      },
+      {
+        "title": "Turn On Relay D5",
+        "description": "Enter Description",
+        "command": "Ddf",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 12,
+          "millis": 12000
+        }
+      },
+      {
+        "title": "Turn On Relay D6",
+        "description": "Enter Description",
+        "command": "Dbf",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 14,
+          "millis": 14000
+        }
+      },
+      {
+        "title": "Turn On Relay D7",
+        "description": "Enter Description",
+        "command": "D7f",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 16,
+          "millis": 16000
+        }
+      },
+      {
+        "title": "Turn ON All Relays",
+        "description": "Enter Description",
+        "command": "D00",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 18,
+          "millis": 18000
+        }
+      }
+    ]
+  }
+}{
+  "groupName": "Bravo",
+  "channels": [
+    {
+      "channelName": "Channel 22",
+      "address": "A08B00C22",
+      "type": "",
+      "group": "Bravo"
+    },
+    {
+      "channelName": "Channel 23",
+      "address": "A08B00C23",
+      "type": "",
+      "group": "Bravo"
+    }
+  ],
+  "timeline": {
+    "events": [
+      {
+        "title": "Turn On all Relays",
+        "description": "Enter Description",
+        "command": "D00",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 0,
+          "millis": 0
+        }
+      },
+      {
+        "title": "Turn Off Relay D7",
+        "description": "Enter Description",
+        "command": "D80",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 2,
+          "millis": 2000
+        }
+      },
+      {
+        "title": "Turn Off Relay D6",
+        "description": "Enter Description",
+        "command": "D40",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 4,
+          "millis": 4000
+        }
+      },
+      {
+        "title": "Turn Off Relay D5",
+        "description": "Enter Description",
+        "command": "D20",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 6,
+          "millis": 6000
+        }
+      },
+      {
+        "title": "Turn Off Relay D4",
+        "description": "Enter Description",
+        "command": "D10",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 8,
+          "millis": 8000
+        }
+      },
+      {
+        "title": "Turn Off Relay D3",
+        "description": "Enter Description",
+        "command": "D08",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 10,
+          "millis": 10000
+        }
+      },
+      {
+        "title": "Turn Off Relay D2",
+        "description": "Enter Description",
+        "command": "D04",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 12,
+          "millis": 12000
+        }
+      },
+      {
+        "title": "Turn Off Relay D1",
+        "description": "Enter Description",
+        "command": "D02",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 14,
+          "millis": 14000
+        }
+      },
+      {
+        "title": "Turn Off Relay D0",
+        "description": "Enter Description",
+        "command": "D01",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 16,
+          "millis": 16000
+        }
+      },
+      {
+        "title": "Turn Off All Relays",
+        "description": "Enter Description",
+        "command": "Dff",
+        "time": {
+          "hours": 0,
+          "minutes": 0,
+          "seconds": 18,
+          "millis": 18000
+        }
+      }
+    ]
+  }
+}

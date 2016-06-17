@@ -183,101 +183,21 @@ public class Simple8bitRelayControlPanel extends javax.swing.JPanel {
         }
     }
     public void setState(String command)
-    {
-        for (JToggleButton button : buttons) {
-            button.setSelected(true);
-        }
-        
+    {   
         command = command.trim();
-        byte[] b = command.getBytes();
-        int upperNibble = 0;
-        int lowerNibble = 0;
-        //assume correct format, if things fail, we'll deal with that in a minute.
-        if(b.length < 3)
-            return;
+        int x = Integer.decode("0x0" + command.substring(1,3));
         
-        if (b[1] >= '0' && b[1] <= '9')
+        int mask = 1;
+        for(int i = 0; i < 8; i++)
         {
-            upperNibble = b[1] - '0';
-        }
-        if (b[1] >= 'a' && b[1] <= 'f')
-        {
-            upperNibble = b[1] - 'a' + 10;
-        }
-        if (b[2] >= '0' && b[2] <= '9')
-        {
-            lowerNibble = b[1] - '0';
-        }
-        if (b[2] >= 'a' && b[2] <= 'f')
-        {
-            lowerNibble = b[2] - 'a' + 10;
-        }
-        
-        if (upperNibble - 8 >= 0)
-        {
-            buttons[7].setSelected(false);
-            upperNibble -= 8;
-        } else
-        {
-            buttons[7].setSelected(true);
-        }
-        if (upperNibble - 4 >= 0)
-        {
-            buttons[6].setSelected(false);
-            upperNibble -= 4;
-        } else
-        {
-            buttons[6].setSelected(true);
-        }
-        if (upperNibble - 2 >= 0)
-        {
-            buttons[5].setSelected(false);
-            upperNibble -= 2;
-        } else
-        {
-            buttons[5].setSelected(true);
-        }
-        if (upperNibble - 1 >= 0)
-        {
-            buttons[4].setSelected(false);
-            upperNibble -= 1;
-        } else
-        {
-            buttons[4].setSelected(true);
-        }
-        
-        
-        if (lowerNibble - 8 >= 0)
-        {
-            buttons[3].setSelected(false);
-            lowerNibble -= 8;
-        } else
-        {
-            buttons[3].setSelected(true);
-        }
-        if (lowerNibble - 4 >= 0)
-        {
-            buttons[2].setSelected(false);
-            lowerNibble -= 4;
-        } else
-        {
-            buttons[2].setSelected(true);
-        }
-        if (lowerNibble - 2 >= 0)
-        {
-            buttons[1].setSelected(false);
-            lowerNibble -= 2;
-        } else
-        {
-            buttons[1].setSelected(true);
-        }
-        if (lowerNibble - 1 >= 0)
-        {
-            buttons[0].setSelected(false);
-            lowerNibble -= 1;
-        } else
-        {
-            buttons[0].setSelected(true);
+            if ((x & mask) > 0)
+            {
+                buttons[i].setSelected(false);
+            }else
+            {
+                buttons[i].setSelected(true);
+            }
+            mask = mask << 1;
         }
         for (JToggleButton button : buttons) {
             chooseIcon(button);

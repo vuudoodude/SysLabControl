@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JTextArea;
+import static java.lang.Thread.sleep;
 
 /**
  *
@@ -50,7 +51,7 @@ public class Terminal extends javax.swing.JPanel {
         textOut = new terminalOutputStream(terminalTextArea);
         terminalComm = new TerminalComm(textOut);
         try {
-            if (!SysLabControl.DO_NOT_CONNECT_COM_PORT)
+            if (!SequenceEditor.DO_NOT_CONNECT_COM_PORT)
                 terminalComm.Connect("COM3");
         } catch (Exception ex) {
             Logger.getLogger(Terminal.class.getName()).log(Level.SEVERE, null, ex);
@@ -69,15 +70,19 @@ public class Terminal extends javax.swing.JPanel {
                 {
                     
                     try {
-                        Thread.sleep(250);
                         
                         Iterator i = bursts.iterator();
                      
                         if(i.hasNext()){
                             String b = (String)i.next();
                             sendBurst(b);
+                            int l = b.length();
                             bursts.remove(b);
-                            Thread.sleep(1000);
+                            Thread.sleep(l * 20);
+                        }
+                        else
+                        {
+                            Thread.sleep(200);
                         }
                         
                     } catch (InterruptedException ex) {

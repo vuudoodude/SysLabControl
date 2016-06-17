@@ -104,7 +104,7 @@ public class ChannelPanel extends javax.swing.JPanel implements ActionListener {
         
         if (selection == moveToDifferentGroup)
         {
-            ArrayList a = ((DefinitionsPanel)getParent().getParent()).parentFrame.groups;
+            ArrayList a = ((DefinitionsPanel)getParent().getParent()).parentFrame.sequence.groups;
             String s = "";
             Iterator i = a.iterator();
             while (i.hasNext())

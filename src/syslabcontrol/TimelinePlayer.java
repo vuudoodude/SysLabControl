@@ -7,18 +7,29 @@ package syslabcontrol;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Paint;
+import java.awt.RadialGradientPaint;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 
 
 /**
@@ -27,7 +38,7 @@ import java.util.logging.Logger;
  */
 
 
-public class TimelinePlayer extends javax.swing.JPanel implements ComponentListener {
+public class TimelinePlayer extends javax.swing.JPanel implements ComponentListener, SequenceViewerInterface {
 
     
    
@@ -37,22 +48,25 @@ public class TimelinePlayer extends javax.swing.JPanel implements ComponentListe
     
     ArrayList <TimelineView> timelineViewers;
     int colorIndex = 0;
-    private final SysLabControl parentFrame;
-    
-    public boolean playing, paused;
+    private final SequenceEditor parentFrame;
     
     Runnable playerThread;
+    private Constant.PlayState playState;   
+    private Constant.PlayState playStateRequest;
     
+    ImageIcon playIcon, pauseIcon, stopIcon;
     
-    public TimelinePlayer(SysLabControl parentFrame) {
+    public TimelinePlayer(SequenceEditor parentFrame) {
         
         this.parentFrame = parentFrame;
         timelineViewers = new <TimelineView> ArrayList();
-        playing = paused = false; 
+        playState = Constant.PlayState.STOP;
+        playStateRequest = Constant.PlayState.NO_CHANGE_REQUESTED;
         
         
         initComponents();
         buildPanel();
+        setIcons();
         
         
     }
@@ -61,7 +75,7 @@ public class TimelinePlayer extends javax.swing.JPanel implements ComponentListe
     // timeline view.
     
     protected void buildPanel() {
-        setName("Timeline");
+        setName("Event Editor");
         viewerPanel.removeAll();
         
         viewerPanel.setLayout(new GridBagLayout());
@@ -72,7 +86,7 @@ public class TimelinePlayer extends javax.swing.JPanel implements ComponentListe
         //find lastEvent to setup viewEnd... need to check all timelines.
         //because timelines are sorted lists, can check just the last element of each.
         
-        Iterator i = parentFrame.groups.iterator();
+        Iterator i = parentFrame.sequence.groups.iterator();
         
         int endView = 0;
         
@@ -92,7 +106,7 @@ public class TimelinePlayer extends javax.swing.JPanel implements ComponentListe
             view.addMouseListener(new MouseListener(){
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                   if(e.getClickCount() > 1 && !playing && !paused)
+                   if(e.getClickCount() > 1 && playState == Constant.PlayState.STOP)
                    {
                        editTimeline(view);
                    }
@@ -116,7 +130,6 @@ public class TimelinePlayer extends javax.swing.JPanel implements ComponentListe
 
             
             }); 
-            
             
             timelineViewers.add(view);
             viewerPanel.add(view,c);
@@ -175,7 +188,6 @@ public class TimelinePlayer extends javax.swing.JPanel implements ComponentListe
     private void editTimeline(TimelineView view) {
         viewerPanel.removeAll();
         
-        
         viewerPanel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -189,27 +201,8 @@ public class TimelinePlayer extends javax.swing.JPanel implements ComponentListe
         viewerPanel.add(eep,c);
         
         validate();
-        
-        
-        
-        
-        
     }
-     private void updateViewers(int millis, boolean playing, boolean paused) {
-        Iterator i = this.timelineViewers.iterator();
-        {
-            while(i.hasNext())
-            {
-                TimelineView tlv = (TimelineView) i.next();
-                tlv.updatePlayingPosition(this.playing, this.paused, millis);
-                tlv.repaint();
-               
-            }
-        }
-    }
-
-    
-    
+     
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -224,8 +217,9 @@ public class TimelinePlayer extends javax.swing.JPanel implements ComponentListe
         jToolBar1 = new javax.swing.JToolBar();
         saveButton = new javax.swing.JButton();
         loadButton = new javax.swing.JButton();
-        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(250, 0), new java.awt.Dimension(250, 0), new java.awt.Dimension(250, 32767));
-        playPauseButton = new javax.swing.JButton();
+        filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(60, 0), new java.awt.Dimension(60, 0), new java.awt.Dimension(60, 32767));
+        playButton = new javax.swing.JButton();
+        pauseButton = new javax.swing.JButton();
         stopButton = new javax.swing.JButton();
 
         setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -266,20 +260,34 @@ public class TimelinePlayer extends javax.swing.JPanel implements ComponentListe
             }
         });
         jToolBar1.add(loadButton);
-        jToolBar1.add(filler1);
+        jToolBar1.add(filler2);
 
-        playPauseButton.setText("Play");
-        playPauseButton.setFocusable(false);
-        playPauseButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        playPauseButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        playPauseButton.addActionListener(new java.awt.event.ActionListener() {
+        playButton.setBorderPainted(false);
+        playButton.setContentAreaFilled(false);
+        playButton.setFocusable(false);
+        playButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        playButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        playButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                playPauseButtonActionPerformed(evt);
+                playButtonActionPerformed(evt);
             }
         });
-        jToolBar1.add(playPauseButton);
+        jToolBar1.add(playButton);
 
-        stopButton.setText("Stop");
+        pauseButton.setBorderPainted(false);
+        pauseButton.setContentAreaFilled(false);
+        pauseButton.setFocusable(false);
+        pauseButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        pauseButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        pauseButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pauseButtonActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(pauseButton);
+
+        stopButton.setBorderPainted(false);
+        stopButton.setContentAreaFilled(false);
         stopButton.setFocusable(false);
         stopButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         stopButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -310,78 +318,52 @@ public class TimelinePlayer extends javax.swing.JPanel implements ComponentListe
     }// </editor-fold>//GEN-END:initComponents
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        parentFrame.saveState();
+        parentFrame.sequence.saveState(this);
 
     }//GEN-LAST:event_saveButtonActionPerformed
 
     private void loadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadButtonActionPerformed
-        parentFrame.loadState();
+        parentFrame.sequence.loadState(this);
+        parentFrame.updatePanelStates();
 
     }//GEN-LAST:event_loadButtonActionPerformed
 
-    private void playPauseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_playPauseButtonActionPerformed
+    private void playButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_playButtonActionPerformed
+        if(null != playState)
         
-        if(!playing && !paused)
-        {
-            
-            //collapse all timelineevents into a single list of events
-            LinkedList <Event> playList = new LinkedList();
-            Iterator i = parentFrame.groups.iterator();
-            while (i.hasNext())
-            {
-                ChannelGroup g = (ChannelGroup)i.next();
-                Iterator eventIterator = g.timeline.iterator();
-                while(eventIterator.hasNext())
-                {
-                    playList.add((Event)eventIterator.next());
-                }
-
-            }
-            if(playList.isEmpty())
-            {
-                return;
-            }
-            Collections.sort(playList);
-            
-            //instantiate new thread if previously stopped.
-            
-            playerThread = new PlayerRunnable(playList, this, parentFrame.getTerminal());
-            
-            //playerThread = new Thread(new PlayerThread(playList, this, parentFrame.getTerminal()));
-            new Thread(playerThread).start();
-        
-        }
-        if(playing)
-        {
-            playing = false;
-            paused = true;
-            
-            playPauseButton.setText("Play");
-            
-            
-        }else
-        {
-            playing = true;
-            paused = false;
-            
-            playPauseButton.setText("Pause");   
-        } 
-        
-    }//GEN-LAST:event_playPauseButtonActionPerformed
+        switch (playState) {
+        //if we're presently paused, play sequence
+            case PAUSE:
+                playStateRequest = Constant.PlayState.PLAY;
+                
+                break;
+        //if we're presently stopped, create new sequence and run it, set button to "play".
+            case STOP:
+                playStateRequest = Constant.PlayState.PLAY;
+                
+                runTestSequence();
+                break;
+            default:
+                break;
+        }   
+    }//GEN-LAST:event_playButtonActionPerformed
 
     private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonActionPerformed
-        playing = false;
-        paused = false;
+        playStateRequest = Constant.PlayState.STOP;
         
-        playPauseButton.setText("Play");
     }//GEN-LAST:event_stopButtonActionPerformed
+
+    private void pauseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pauseButtonActionPerformed
+        playStateRequest = Constant.PlayState.PAUSE;
+    }//GEN-LAST:event_pauseButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.Box.Filler filler1;
+    private javax.swing.Box.Filler filler2;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JButton loadButton;
-    private javax.swing.JButton playPauseButton;
+    private javax.swing.JButton pauseButton;
+    private javax.swing.JButton playButton;
     private javax.swing.JButton saveButton;
     private javax.swing.JButton stopButton;
     private javax.swing.JPanel viewerPanel;
@@ -422,122 +404,111 @@ public class TimelinePlayer extends javax.swing.JPanel implements ComponentListe
         }
     }
 
-   
-
-   
-    
-     protected class PlayerRunnable implements Runnable{
-         boolean repeat;
-         boolean playing;
-         boolean paused;
-         boolean stop;
-         int playPosition;
-         TimelinePlayer player;
-         Terminal terminal;
-         LinkedList <Event> playList;
-         
-         protected PlayerRunnable(LinkedList playList, TimelinePlayer player, Terminal terminal)
-         {
-             repeat = false;
-             stop = false;
-             playing = false;
-             paused = true; //starts paused.
-             playPosition = 0;
-             this.player = player;
-             this.terminal = terminal;
-             this.playList = playList;
-             
-         }
-         public void updateState()
-         {
-             playing = player.playing;
-             paused = player.paused;
-             stop = (!playing && ! paused);
-             
-         }
-        
-
-        //Every 500 msec, wake up, check to see if it's time to do the next event.
-        //if so, send the relevant data through the terminal.
-        //either way, update the view and go back to sleep.
-
-        @Override
-        public void run() {
-            
-            //how long have we been running? Using this method instead of absolute time allows us to pause.
-            long milliAccumulator = 0;
-            
-            long prevMillis = System.currentTimeMillis();
-            long currMillis;
-            
-            Iterator playlistIterator = playList.iterator();
-            Event nextEvent = (Event)playlistIterator.next();
-            
-            long nextMillis = (long) nextEvent.time.toMillis();
-            
-            
-            while(!stop)
-            {   
-                try {
-                    updateState();
-                    //wake thread every second.
-                    Thread.sleep(200);
-                    if(playing)
-                    {
-                        //accumulate time on the counter
-                        currMillis = System.currentTimeMillis();
-                        milliAccumulator = milliAccumulator + (currMillis - prevMillis);
-                        prevMillis = currMillis;
-                        
-                        player.updateViewers((int)milliAccumulator, playing, paused);
-                        
-                        
-                        //is it time for next Event in queue?
-                        //while loop ensures that if several events have the same time stamp,
-                        //they all get handled together.
-                        while (milliAccumulator > nextMillis)
-                        {
-                            doEvent(nextEvent);
-                            
-                            if (playlistIterator.hasNext())
-                            {
-                                
-                                nextEvent = (Event)playlistIterator.next();
-                                nextMillis = nextEvent.time.toMillis();
-                            }
-                            else
-                            {
-                                //end playing, clean up
-                                
-                                player.playing = false;
-                                player.paused = false;
-                                player.playPauseButton.setText("Play");
-                                updateState();
-                                player.updateViewers((int)milliAccumulator, playing, paused);
-                                break;
-                            }
-                        }
-                    }
-                    if(paused)
-                    {
-                        //increment current time without adding to the accumulator
-                        currMillis = System.currentTimeMillis();
-                        prevMillis = currMillis;
-                    }
-                    
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(TimelinePlayer.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
+    @Override
+    public void updateViewer(int currentPosition, int sequenceLength, Constant.PlayState p) {
+        //handle stop message first, highest priority.
+        if (p == Constant.PlayState.STOP)
+        {
+            playState = Constant.PlayState.STOP;
+            playStateRequest = Constant.PlayState.NO_CHANGE_REQUESTED;
+            return;
         }
 
-        private void doEvent(Event nextEvent) {
-            String commandString  = nextEvent.group.buildCommandString(nextEvent.command);
-            
-            terminal.sendCommand(commandString);
+        //once request has been granted, reset request token
+        if (playStateRequest == Constant.PlayState.NO_CHANGE_REQUESTED)
+            return;
+        if ( playStateRequest == p)
+        {
+            playState = p;
+            playStateRequest = Constant.PlayState.NO_CHANGE_REQUESTED;
+            return;
         }
-
         
     }
     
+    @Override
+    public Constant.PlayState requestedPlayState() {
+        return playStateRequest;
+    }
+
+    private void runTestSequence() {
+        TestSequence seq = parentFrame.sequence;
+        
+        seq.addViewer(this);
+        for(TimelineView v : timelineViewers)
+        {
+            seq.addViewer(v);
+        }
+        seq.setTerminal(parentFrame.terminal);
+        seq.playSequence();
+    }
+    
+    private void setIcons() 
+    {
+        int iconSize = 24;
+        try {
+            BufferedImage img = null;
+            URL url = getClass().getResource("pause_play_stop_black.png");
+            img = ImageIO.read(new File(url.getPath()));
+            
+            Image pauseImage = ((img.getSubimage(0, 0, img.getWidth()/3, img.getHeight()))
+                                        .getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
+            Image playImage = ((img.getSubimage(1 * img.getWidth() / 3, 0, img.getWidth()/3, img.getHeight()))
+                                        .getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
+            Image stopImage = ((img.getSubimage(2 * img.getWidth() / 3, 0, img.getWidth()/3, img.getHeight()))
+                                        .getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
+            
+            playButton.setIcon(new ImageIcon(playImage));
+            pauseButton.setIcon(new ImageIcon(pauseImage));
+            stopButton.setIcon(new ImageIcon(stopImage));
+            
+            
+            
+            
+            int radius = (int) img.getHeight()/2;
+            float dist[] = {0.0f, 0.95f};
+            
+            
+            Graphics2D g2d = (Graphics2D) img.getGraphics();
+            g2d.setPaint(new Color(0x4000030F, true));
+            g2d.fill(new Rectangle2D.Double(0,0,(double)img.getWidth(), img.getHeight()));
+            
+            
+            Image r_pauseImage = ((img.getSubimage(0, 0, img.getWidth()/3, img.getHeight()))
+                                        .getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
+            Image r_playImage = ((img.getSubimage(1 * img.getWidth() / 3, 0, img.getWidth()/3, img.getHeight()))
+                                        .getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
+            Image r_stopImage = ((img.getSubimage(2 * img.getWidth() / 3, 0, img.getWidth()/3, img.getHeight()))
+                                        .getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
+            
+            playButton.setRolloverIcon(new ImageIcon(r_playImage));
+            pauseButton.setRolloverIcon(new ImageIcon(r_pauseImage));
+            stopButton.setRolloverIcon(new ImageIcon(r_stopImage));
+            
+            
+            
+            
+            
+            /*
+            int radius = 15; float dist[] = {0.0f,0.95f};
+            Paint p = new RadialGradientPaint(new Point2D.Double((double)x,(double)y), //center point
+                                              radius,dist, 
+                                              new Color[] {new Color(0xFFFFFF00, true), new Color(0x30FFFF00,true)});
+            
+            g2d.setPaint(p);
+            g2d.fill(new Ellipse2D.Double(x-3*BUBBLE_RADIUS,y-3*BUBBLE_RADIUS,
+                                      6*BUBBLE_RADIUS,6*BUBBLE_RADIUS));
+            */
+            
+            
+            
+            
+            //return new ImageIcon(img.getScaledInstance(10, 10, Image.SCALE_SMOOTH));
+        } catch (IOException ex) {
+            System.out.println("Could not find icon file for pause / play / stop buttons");
+            return;
+        }
+    }
+    
+
 }
